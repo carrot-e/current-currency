@@ -1,0 +1,8 @@
+{
+    "require": {
+        "wisembly/elephant.io": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {"Components\\": "components/"}
+    }
+}
