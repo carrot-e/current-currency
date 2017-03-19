@@ -14,8 +14,12 @@ while (true) {
 
     $r = $client->read();
     if (!empty($r)) {
-        var_dump(json_decode($r, true));
-        $currencyApi = new CurrencyLayerClient($from = 'UAH', $to = 'EUR', $amount = 10);
+        $r = json_decode($r, true);
+        $currencyApi = new CurrencyLayerClient();
+        $amount = $currencyApi->convert($from = 'UAH', $to = 'EUR', $amount = intval($r[1]['msg']));
+        if (!empty($amount)) {
+            $client->emit('converted', ['amount' => $amount]);
+        }
     }
 
     usleep(500);

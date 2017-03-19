@@ -13,6 +13,11 @@ io.on('connection', function(socket) {
         console.log(msg);
         io.emit('broadcast', {msg: msg});
     });
+
+    socket.on('converted', function(msg) {
+        console.log(msg);
+        io.emit('converted', msg);
+    });
 });
 
 http.listen(4001, function() {
