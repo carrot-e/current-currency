@@ -1,3 +1,6 @@
+Prerequisites:
+ - RabbitMQ default installation;
+
 To run the app do the following in project root:
 ```
 npm install

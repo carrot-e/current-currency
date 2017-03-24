@@ -4,6 +4,7 @@
   "description": "currency exchange app",
   "dependencies": {
     "express": "^4.15.2",
-    "socket.io": "^1.7.3"
+    "socket.io": "^1.7.3",
+    "amqplib": "^0.5.1"
   }
 }

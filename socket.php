@@ -1,27 +1,39 @@
 <?php
 set_time_limit(-1);
 
-use ElephantIO\Client;
-use ElephantIO\Engine\SocketIO\Version1X;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Components\CurrencyLayerClient;
+use PhpAmqpLib\Message\AMQPMessage;
 
 require 'vendor/autoload.php';
-$client = new Client(new Version1X('http://localhost:4001'));
 
+$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+$channel = $connection->channel();
+$channel->queue_declare('user-input-queue', false, false, false, false);
+$channel->queue_declare('converted-queue', false, false, false, false);
 
-while (true) {
-    $client->initialize();
+echo ' [*] Waiting for values. To exit press CTRL+C', "\n";
+$callback = function($msg) use ($channel) {
+    $data = json_decode($msg->body, true);
 
-    $r = $client->read();
-    if (!empty($r)) {
-        $r = json_decode($r, true);
-        $currencyApi = new CurrencyLayerClient();
-        $amount = $currencyApi->convert($from = 'UAH', $to = 'EUR', $amount = intval($r[1]['msg']));
-        if (!empty($amount)) {
-            $client->emit('converted', ['amount' => $amount]);
-        }
+    $currencyApi = new CurrencyLayerClient();
+    $amount = $currencyApi->convert($from = 'UAH', $to = 'EUR', $amount = $data['msg']);
+    if (!empty($amount)) {
+        var_dump('converted: ' . $amount);
+        $channel->basic_publish(
+            new AMQPMessage(json_encode(['amount' => $amount])),
+            '',
+            'converted-queue'
+        );
     }
 
-    usleep(500);
-    $client->close();
+};
+
+$channel->basic_consume('user-input-queue', '', false, true, false, false, $callback, null);
+
+while(count($channel->callbacks)) {
+    $channel->wait();
 }
+
+$channel->close();
+$connection->close();
