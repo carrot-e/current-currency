@@ -17,19 +17,18 @@ $callback = function($msg) use ($channel) {
     $data = json_decode($msg->body, true);
 
     $currencyApi = new CurrencyLayerClient();
-    $amount = $currencyApi->convert($from = 'UAH', $to = 'EUR', $amount = $data['msg']);
+    $amount = $currencyApi->convert($data['from'], $data['to'], $data['amount']);
     if (!empty($amount)) {
-        var_dump('converted: ' . $amount);
+        echo ' [+] converted: ' , $amount, PHP_EOL;
         $channel->basic_publish(
             new AMQPMessage(json_encode(['amount' => $amount])),
             '',
             'converted-queue'
         );
     }
-
 };
 
-$channel->basic_consume('user-input-queue', '', false, true, false, false, $callback, null);
+$channel->basic_consume('user-input-queue', '', false, true, false, false, $callback);
 
 while(count($channel->callbacks)) {
     $channel->wait();

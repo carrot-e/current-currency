@@ -3,15 +3,18 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var amqp = require('amqplib/callback_api');
 
-var channel;
+var channel,
+    userInputQueue = 'user-input-queue',
+    convertedQueue = 'converted-queue';
+
 amqp.connect('amqp://localhost', function(err, conn) {
     conn.createChannel(function(err, ch) {
         channel = ch;
 
-        ch.assertQueue('converted-queue', {durable: false});
-        ch.consume('converted-queue', function(msg) {
-            console.log(" [x] Received %s", msg.content.toString());
+        ch.assertQueue(convertedQueue, {durable: false});
+        ch.consume(convertedQueue, function(msg) {
             msg = msg.content.toString();
+            console.log(" [x] Received %s", msg);
             io.emit('converted', JSON.parse(msg));
         }, {noAck: true});
     });
@@ -25,7 +28,9 @@ io.on('connection', function(socket) {
     });
 
     socket.on('broadcast', function(msg) {
-        channel.sendToQueue('user-input-queue', new Buffer(JSON.stringify({msg: msg})));
+        msg = JSON.stringify(msg);
+        console.log(" [x] Sending %s", msg);
+        channel.sendToQueue(userInputQueue, new Buffer(msg));
     });
 });
 

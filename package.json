@@ -1,5 +1,5 @@
 {
-  "name": "current currency",
+  "name": "current-currency",
   "version": "0.0.1",
   "description": "currency exchange app",
   "dependencies": {
