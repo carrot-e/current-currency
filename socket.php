@@ -21,7 +21,7 @@ $callback = function($msg) use ($channel) {
     if (!empty($amount)) {
         echo ' [+] converted: ' , $amount, PHP_EOL;
         $channel->basic_publish(
-            new AMQPMessage(json_encode(['amount' => $amount])),
+            new AMQPMessage(json_encode(['amount' => $amount, 'clientId' => $data['clientId']])),
             '',
             'converted-queue'
         );
