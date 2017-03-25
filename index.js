@@ -1,7 +1,9 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var amqp = require('amqplib/callback_api');
+var path = require('path');
 
 var channel,
     userInputQueue = 'user-input-queue',
@@ -34,6 +36,11 @@ io.on('connection', function(socket) {
         console.log(" [x] Sending %s", msg);
         channel.sendToQueue(userInputQueue, new Buffer(msg));
     });
+});
+
+app.use(express.static(__dirname + '/frontend'));
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname + '/frontend/index.html'));
 });
 
 http.listen(4001, function() {

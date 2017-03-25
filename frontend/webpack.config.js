@@ -45,9 +45,9 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin({ // define where to save the file
-      filename: path.resolve(__dirname, './dist') + '/[name].bundle.css',
-      allChunks: true,
-    }),
+      filename: '[name].bundle.css',
+      allChunks: true
+    })
   ],
   resolve: {
     alias: {
