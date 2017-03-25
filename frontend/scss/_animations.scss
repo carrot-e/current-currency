@@ -1,0 +1,33 @@
+.border-animated {
+    border: 0;
+    box-sizing: border-box;
+    position: relative;
+    vertical-align: middle;
+    overflow: hidden;
+
+    .input-after {
+        box-sizing: border-box;
+        content: '';
+        position: absolute;
+        border-bottom: 2px solid $color-neutral;
+        width: 100%;
+        height: 0;
+        bottom: 0;
+        left: 0;
+        transition: transform 0.25s ease-out;
+    }
+
+    input:focus + .input-after {
+        transform: translateX(100%);
+    }
+}
+
+.scaleIn-enter-active {
+    transition: transform .1s ease-out;
+    transform: scale(1.2);
+    transform-origin: right;
+    display: inline-block;
+}
+.scaleIn-enter-to {
+    transform: scale(1);
+}

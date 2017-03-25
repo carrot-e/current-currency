@@ -1,15 +1,23 @@
 @import 'reset';
 @import 'variables';
+@import 'animations';
 
 // LAYOUT
 body {
+    overflow: hidden;
     font-family: $font-family;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background: $color-neutral;
+    box-sizing: border-box;
 }
 
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+::selection {
+    background: rgba($color-accent, 0.8);
 }

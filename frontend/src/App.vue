@@ -1,21 +1,34 @@
 <template>
     <div id="app" class="app">
+        <div class="bar">
+            current currency
+        </div>
         <div class="input">
             <multiselect
                     v-model="currencyFrom"
                     :options="currencyOptions"
                     selectLabel=""
-                    hideSelected="true"
-                    >
-            </multiselect>
-            <input autofocus class="input-value" v-model.number="userValue" v-on:keypress="isCurrency" v-on:input="onInput" type="number" step="any">
+                    :hideSelected="true"
+                    @input="onInput"
+            ></multiselect>
+            <div class="border-animated input-value">
+                <input autofocus class="input input-value" v-model.number="userValue" @keypress="isCurrency" @input="onInput" type="number" step="any">
+                <div class="input-after"></div>
+            </div>
         </div>
         <div class="output">
             <multiselect
                     v-model="currencyTo"
-                    :options="currencyOptions">
-            </multiselect>
-            <div class="output-value">{{ convertedValue }}</div>
+                    :options="currencyOptions"
+                    selectLabel=""
+                    :hideSelected="true"
+                    @input="onInput"
+            ></multiselect>
+            <div class="output-value">
+                <transition name="scaleIn">
+                    <span v-show="convertedValue !== ''">{{ convertedValue }}</span>
+                </transition>
+            </div>
         </div>
     </div>
 </template>
@@ -51,8 +64,12 @@
 
             onInput: debounce(function() {
                 this.convertedValue = '';
-                socket.emit('broadcast', this.userValue);
-            }, 300)
+                socket.emit('broadcast', {
+                    amount: this.userValue,
+                    from: this.currencyFrom,
+                    to: this.currencyTo
+                });
+            }, 200)
         },
 
         created() {
@@ -76,6 +93,7 @@
         color: $color-dark;
         margin-top: 60px;
         box-shadow: 0 2px 3px 1px rgba($color-dark, 0.2);
+        background: $color-light;
     }
     .input,
     .output {
@@ -88,6 +106,9 @@
         .multiselect__tags {
             border: 0;
         }
+        .multiselect__option--highlight {
+            background: $color-accent;
+        }
     }
     .input-value {
         border: 0;
@@ -96,12 +117,24 @@
         width: 100%;
         outline: none;
         height: 5rem;
+        background: transparent;
+
+        &.input {
+            box-shadow: inset 0px -5px 0px -1px $color-accent;
+        }
     }
     .output-value {
         font-size: 4rem;
         text-align: right;
         height: 4rem;
         width: 100%;
+    }
+    .bar {
+        background: $color-accent;
+        padding: 10px 10px 10px;
+        margin: -10px -10px 0;
+        text-align: center;
+        color: $color-light;
     }
 
 </style>
